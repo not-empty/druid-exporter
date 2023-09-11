@@ -1,0 +1,10 @@
+# config file version
+apiVersion: 1
+
+datasources:
+- name: monitor
+  type: prometheus
+  orgId: 1
+  url: http://prometheus:9090
+  readOnly: false
+  editable: true

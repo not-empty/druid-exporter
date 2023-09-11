@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  api:
+    container_name: druid-exporter-api
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    labels:
+      container_group: druid-exporter-api
+    command: cargo watch -x run
+    ports:
+      - 7080:7080
+    volumes:
+      - ./:/app/
+
+  grafana:
+    image: grafana/grafana
+    container_name: druid-exporter-grafana
+    hostname: grafana
+    environment:
+      -  GF_SECURITY_ADMIN_PASSWORD=admin
+    labels:
+      container_group: druid-exporter-grafana
+    volumes:
+      - ./docker/configs/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./docker/configs/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - 3000:3000
+
+  prometheus:
+    image: prom/prometheus
+    container_name: druid-exporter-prometheus
+    labels:
+      container_group: druid-exporter-prometheus
+    hostname: prometheus
+    volumes:
+      - ./docker/configs/prometheus:/etc/prometheus
+      - ./storage/data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
