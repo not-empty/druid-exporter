@@ -16,3 +16,4 @@ k6/
 .idea
 
 .vscode
+.env

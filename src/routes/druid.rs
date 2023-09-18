@@ -6,10 +6,10 @@ use crate::{types::{app_state::AppState, druid_metrics::{DruidMetric, DataSource
 
 
 #[post("/druid")]
-pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, data: web::Data<AppState>) -> impl Responder {
-    let registry = data.registry.lock().unwrap();
-    let mut metrics_gauge = data.metrics_gauge.lock().unwrap();
-    let mut metrics_histogram = data.metrics_histogram.lock().unwrap();
+pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, state: web::Data<AppState>) -> impl Responder {
+    let registry = state.registry.lock().unwrap();
+    let mut metrics_gauge = state.metrics_gauge.lock().unwrap();
+    let mut metrics_histogram = state.metrics_histogram.lock().unwrap();
 
     for i in body.iter() {
         let data = Arc::new(i);
@@ -43,10 +43,10 @@ pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, data: web::Data<Ap
             add_metric(
                 &metrics_gauge,
                 &metrics_histogram,
-                data.clone(),
+                Arc::clone(&data),
                 &metric_name,
                 &j
-            )
+            );
         }
     }
 
