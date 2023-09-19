@@ -1,6 +1,7 @@
 # Druid Exporter
 
 <p align="center">
+    <img src="https://img.shields.io/github/v/release/kiwfy/druid_exporter.svg?style=for-the-badge&color=29F1FB&labelColor=22272E" />
     <img src="https://img.shields.io/badge/Welcome-29C68F?style=for-the-badge&label=PR&labelColor=22272E&logo=git">
     <img src="https://img.shields.io/badge/Rust-000000.svg?style=for-the-badge&logo=Rust&logoColor=white">
     <img src="https://img.shields.io/badge/Apache%20Druid-29F1FB.svg?style=for-the-badge&logo=Apache-Druid&logoColor=black">
@@ -46,8 +47,17 @@ Druid Exporter plays a fundamental role as a receiver of metrics events coming f
 
 The Project is entirely made in Rust with the Actix-web framework to provide maximum performance in receiving and delivering metrics for a large flow of requests.
 
+<div>
+    <kbd>
+        <img src="static/img1.png"/>
+    </kbd>
+    <kbd>
+        <img src="static/img2.png" />
+    </kbd>
+</div>
 
-## Installation
+
+### Installation
 
 Requires Docker
 
@@ -80,7 +90,9 @@ druid.monitoring.monitors=["org.apache.druid.server.metrics.QueryCountStatsMonit
 
 Feel free to add more metrics to monitor, we recommend the above ones as they facilitate cluster scalability and monitoring aspects
 
-## Run
+> ℹ️ Please take a look at the Apache Druid emitter and metrics for more information and configurations [https://druid.apache.org/docs/latest/configuration/#http-emitter-module](https://druid.apache.org/docs/latest/configuration/#http-emitter-module)
+
+### Run
 
 In development mode you can run the following command on your terminal:
 
@@ -108,7 +120,7 @@ In production mode you can build the Dockerfile located in the ```docker/prod```
 docker build --platform=linux/amd64 --target prod -t druid-exporter -f docker/prod/Dockerfile .
 ```
 
-> Info: We recommend using Docker BuildKit for better build performance
+> ⚠️ We recommend using Docker BuildKit for better build performance
 
 After executing the command, a docker image called ```druid-exporter``` will be created which will only contain the Docker Exporter project which will be available on **port 7080**
 
