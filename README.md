@@ -1,13 +1,14 @@
 # Druid Exporter
 
 <p align="center">
-    <img src="https://img.shields.io/github/v/release/kiwfy/druid_exporter.svg?style=for-the-badge&color=29F1FB&labelColor=22272E" />
-    <img src="https://img.shields.io/badge/Welcome-29C68F?style=for-the-badge&label=PR&labelColor=22272E&logo=git">
-    <img src="https://img.shields.io/badge/Rust-000000.svg?style=for-the-badge&logo=Rust&logoColor=white">
-    <img src="https://img.shields.io/badge/Apache%20Druid-29F1FB.svg?style=for-the-badge&logo=Apache-Druid&logoColor=black">
-    <img src="https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=Docker&logoColor=white">
-    <img src="https://img.shields.io/badge/Prometheus-E6522C.svg?style=for-the-badge&logo=Prometheus&logoColor=white">
-    <img src="https://img.shields.io/badge/Grafana-F46800.svg?style=for-the-badge&logo=Grafana&logoColor=white">
+    <img src="https://img.shields.io/github/v/release/kiwfy/druid_exporter.svg?style=flat-square&color=29F1FB&labelColor=22272E" />
+    <img src="https://img.shields.io/badge/Welcome-29C68F?style=flat-square&label=PRs&labelColor=22272E&logo=git">
+    <br/>
+    <img src="https://img.shields.io/badge/Rust-000000.svg?style=flat-square&logo=Rust&logoColor=white">
+    <img src="https://img.shields.io/badge/Apache%20Druid-29F1FB.svg?style=flat-square&logo=Apache-Druid&logoColor=black">
+    <img src="https://img.shields.io/badge/Docker-2496ED.svg?style=flat-square&logo=Docker&logoColor=white">
+    <img src="https://img.shields.io/badge/Prometheus-E6522C.svg?style=flat-square&logo=Prometheus&logoColor=white">
+    <img src="https://img.shields.io/badge/Grafana-F46800.svg?style=flat-square&logo=Grafana&logoColor=white">
 </p>
 
 
