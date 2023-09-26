@@ -134,4 +134,4 @@ Make a change in your file and be careful with your updates!
 **Any new code will only be accepted with all viladations.**
 
 
-**Kiwfy - Open your code, open your mind!**
+**Not Empty Foundation - Free codes, full minds**
