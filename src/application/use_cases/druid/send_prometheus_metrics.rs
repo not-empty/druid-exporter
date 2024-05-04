@@ -1,17 +1,23 @@
 use std::sync::Arc;
 
-use actix_web::{post, HttpResponse, Responder, web};
+use actix_web::web;
 
-use crate::{types::{app_state::AppState, druid_metrics::{DruidMetric, DataSourceTypes}}, utils::metrics::{add_metric, register_new_metric}};
+use crate::{types::{app_state::AppState, druid_metrics::{DataSourceTypes, DruidMetric}}, utils::metrics::{add_metric, register_new_metric, transform_metric_name}};
 
 
-#[post("/druid")]
-pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, state: web::Data<AppState>) -> impl Responder {
+pub fn prometheus_publisher(
+    metrics: &[DruidMetric],
+    state: web::Data<AppState>,
+) {
+    if !state.dispatchers.lock().unwrap().contains(&String::from("prometheus")){
+        return;
+    }
+
     let registry = state.registry.lock().unwrap();
     let mut metrics_gauge = state.metrics_gauge.lock().unwrap();
     let mut metrics_histogram = state.metrics_histogram.lock().unwrap();
 
-    for i in body.iter() {
+    for i in metrics {
         let data = Arc::new(i);
         let druid_metric = data.metric.clone().unwrap_or(String::default());
 
@@ -19,11 +25,7 @@ pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, state: web::Data<A
             continue;
         }
 
-        let metric_name = String::from("druid_expo_")
-            + &druid_metric.
-                clone().
-                to_string().
-                replace("/", "_");
+        let metric_name = transform_metric_name(druid_metric.clone());
 
         if !metrics_gauge.contains_key(&metric_name) {
             register_new_metric(
@@ -49,7 +51,4 @@ pub async fn druid_handler(body: web::Json<Vec<DruidMetric>>, state: web::Data<A
             );
         }
     }
-
-    HttpResponse::Ok().body("ok")
 }
-
