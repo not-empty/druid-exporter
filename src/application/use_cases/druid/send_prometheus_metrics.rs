@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_web::web;
 
-use crate::{types::{app_state::AppState, druid_metrics::{DataSourceTypes, DruidMetric}}, utils::metrics::{add_metric, register_new_metric, transform_metric_name}};
+use crate::{types::{app_state::AppState, druid_metrics::{DataSourceTypes, DruidMetric}}, utils::metrics::{add_metric, check_allowed_metric, register_new_metric, transform_metric_name}};
 
 
 pub fn prometheus_publisher(
@@ -16,6 +16,7 @@ pub fn prometheus_publisher(
     let registry = state.registry.lock().unwrap();
     let mut metrics_gauge = state.metrics_gauge.lock().unwrap();
     let mut metrics_histogram = state.metrics_histogram.lock().unwrap();
+    let metrics_config = state.metrics.lock().unwrap();
 
     for i in metrics {
         let data = Arc::new(i);
@@ -26,6 +27,10 @@ pub fn prometheus_publisher(
         }
 
         let metric_name = transform_metric_name(druid_metric.clone());
+
+        if !check_allowed_metric(&metrics_config, metric_name.clone()) {
+            continue;
+        }
 
         if !metrics_gauge.contains_key(&metric_name) {
             register_new_metric(

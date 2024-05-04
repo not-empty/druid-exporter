@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::{MutexGuard, Arc}, env};
 
 use prometheus::{GaugeVec, HistogramVec, Registry, HistogramOpts, Opts};
 
-use crate::types::druid_metrics::{DruidMetric, Returns};
+use crate::types::{self, druid_metrics::{DruidMetric, Returns}};
 
 
 static BASE_LABELS: [&'static str; 6] = [
@@ -86,6 +86,21 @@ pub fn transform_metric_name(metric_name: String) -> String {
             .to_string()
             .to_lowercase()
             .replace("/", "_")
+}
+
+pub fn check_allowed_metric(
+    metrics_config: &MutexGuard<types::metrics::Metrics>,
+    metric_name: String
+) -> bool{
+    if metrics_config.ignore.contains(&metric_name) {
+        return false;
+    }
+
+    if metrics_config.allowed.len() > 0 && !metrics_config.allowed.contains(&metric_name) {
+        return false
+    }
+
+    return true;
 }
 
 pub fn add_metric(

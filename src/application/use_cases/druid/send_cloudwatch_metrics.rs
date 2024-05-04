@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::web;
 use aws_sdk_cloudwatch::types::MetricDatum;
 
-use crate::{types::{app_state::AppState, druid_metrics::DruidMetric}, utils::metrics::{add_cw_metric, transform_metric_name}};
+use crate::{types::{app_state::AppState, druid_metrics::DruidMetric}, utils::metrics::{add_cw_metric, check_allowed_metric, transform_metric_name}};
 
 
 pub async fn cloudwatch_publisher(
@@ -15,7 +15,8 @@ pub async fn cloudwatch_publisher(
     }
 
     let mut metric_data: Vec<MetricDatum> = Vec::new();
-    let cw = state.cw.lock().unwrap();
+    let cw = <std::option::Option<aws_sdk_cloudwatch::Client> as Clone>::clone(&state.cw.lock().unwrap()).unwrap();
+    let metrics_config = state.metrics.lock().unwrap();
 
     for i in metrics {
         let data = Arc::new(i);
@@ -26,6 +27,10 @@ pub async fn cloudwatch_publisher(
         }
 
         let metric_name = transform_metric_name(druid_metric.clone());
+
+        if !check_allowed_metric(&metrics_config, metric_name.clone()) {
+            continue;
+        }
 
         metric_data.push(
             add_cw_metric(
@@ -42,10 +47,9 @@ pub async fn cloudwatch_publisher(
         .await;
 
     match r {
-        Ok(_) => true,
         Err(_) => {
             log::error!("Error to send metric do CW, Please verify your credentials");
-            false
         },
+        _ => {}
     };
 }
