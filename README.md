@@ -64,6 +64,26 @@ Requires Docker
 
 Please create ```.env``` file from ```.env.example``` and fill in all keys
 
+In ```.env``` file, you can enable the dispatcher by setting the value of the ```DISPATCHERS``` key. he available values are ```prometheus``` and ```cloudwatch```, and you can specify one or both (separated by commas). This setting is optional, with the default value being ```prometheus```.
+
+It's optional, but you can filter events that will be sent to the dispatcher by configuring the ```expo.yaml``` file based on ```expo.yaml.example```. This allows you to ignore or allow specific events.
+
+```yaml
+ignore:
+    - event-1
+
+allowed:
+    - event-1
+    - event-2
+    - event-4
+```
+
+All events will start with ```druid_expo_```, followed by the [Druid Metric](https://druid.apache.org/docs/latest/operations/metrics/), where ```/``` is replaced with ```_```. For example:
+
+```
+sys/mem/free -> druid_expo_sys_mem_free
+```
+
 In Apache Druid edit ```_common/common.runtime.properties``` change ```druid.emitter``` to ```http``` and add ```druid.emitter.http.recipientBaseUrl``` with Druid Exporter URL plus this path ```/druid``` and ```druid.emitter.logging.logLevel``` with value ```info```, like this:
 
 ```java
