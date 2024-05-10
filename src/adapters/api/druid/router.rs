@@ -1,6 +1,6 @@
 use actix_web::{post, web, Responder};
 
-use crate::{adapters::api::druid::controllers::druid::druid_controller, types::{app_state::AppState, druid_metrics::DruidMetric}};
+use crate::{adapters::api::druid::controllers::druid::druid_controller, types::{app_state::AppState, druid::metrics::DruidMetric}};
 
 
 #[post("/druid")]

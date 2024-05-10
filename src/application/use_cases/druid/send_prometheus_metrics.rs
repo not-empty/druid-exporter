@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_web::web;
 
-use crate::{types::{app_state::AppState, druid::dispatcher::DispatcherStrategy, druid_metrics::{DataSourceTypes, DruidMetric}}, utils::metrics::{add_metric, check_allowed_metric, register_new_metric, transform_metric_name}};
+use crate::{types::{app_state::AppState, druid::{dispatcher::DispatcherStrategy, metrics::DruidMetric, metrics::DataSourceTypes}}, utils::metrics::{add_metric, check_allowed_metric, register_new_metric, transform_metric_name}};
 
 
 pub struct PrometheusStrategy;

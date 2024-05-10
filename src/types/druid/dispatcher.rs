@@ -1,6 +1,6 @@
 use actix_web::web;
 
-use crate::types::{app_state::AppState, druid_metrics::DruidMetric};
+use crate::types::{app_state::AppState, druid::metrics::DruidMetric};
 
 pub trait DispatcherStrategy {
     async fn send_event(

@@ -3,6 +3,7 @@ mod utils;
 mod adapters;
 mod application;
 mod infra;
+mod version;
 
 use dotenv::dotenv;
 use env_logger::Env;

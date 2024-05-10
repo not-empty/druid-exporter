@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::{MutexGuard, Arc}, env};
 
 use prometheus::{GaugeVec, HistogramVec, Registry, HistogramOpts, Opts};
 
-use crate::types::{self, druid_metrics::{DruidMetric, Returns}};
+use crate::types::{self, druid::metrics::{DruidMetric, Returns}};
 
 
 static BASE_LABELS: [&'static str; 6] = [

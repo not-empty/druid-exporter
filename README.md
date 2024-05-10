@@ -138,7 +138,7 @@ After the command is executed you can go to [http://localhost:3000](http://local
 In production mode you can build the Dockerfile located in the ```docker/prod``` folder, to build this you may run this command:
 
 ```bash
-docker build --platform=linux/amd64 --target prod -t druid-exporter -f docker/prod/Dockerfile .
+docker build --target prod -t druid-exporter -f docker/prod/Dockerfile .
 ```
 
 > ⚠️ We recommend using Docker BuildKit for better build performance

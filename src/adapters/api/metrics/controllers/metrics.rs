@@ -1,4 +1,4 @@
-use actix_web::{ HttpResponse, Responder, web};
+use actix_web::{HttpResponse, Responder, web};
 use prometheus::Encoder;
 
 use crate::types;

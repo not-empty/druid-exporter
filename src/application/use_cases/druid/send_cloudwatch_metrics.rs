@@ -2,11 +2,38 @@ use std::sync::Arc;
 
 use actix_web::web;
 use aws_sdk_cloudwatch::types::MetricDatum;
+use std::sync::MutexGuard;
 
-use crate::{types::{app_state::AppState, druid::dispatcher::DispatcherStrategy, druid_metrics::DruidMetric}, utils::metrics::{add_cw_metric, check_allowed_metric, transform_metric_name}};
+use crate::{types::{app_state::AppState, druid::{dispatcher::DispatcherStrategy, metrics::DruidMetric}, metrics::Metrics}, utils::metrics::{add_cw_metric, check_allowed_metric, transform_metric_name}};
 
 
 pub struct CloudwatchStrategy;
+
+impl CloudwatchStrategy {
+    fn get_metric(
+        &self,
+        metric: &DruidMetric,
+        metrics_config: &MutexGuard<Metrics>
+    ) -> Option<aws_sdk_cloudwatch::types::MetricDatum> {
+        let data = Arc::new(metric);
+        let druid_metric = data.metric.clone().unwrap_or(String::default());
+
+        if druid_metric == String::default() {
+            return None;
+        }
+
+        let metric_name = transform_metric_name(druid_metric.clone());
+
+        if !check_allowed_metric(metrics_config, metric_name.clone()) {
+            return None;
+        }
+
+        Some(add_cw_metric(
+            Arc::clone(&data),
+            &metric_name,
+        ))
+    }
+}
 
 impl DispatcherStrategy for CloudwatchStrategy {
     async fn send_event(
@@ -23,25 +50,10 @@ impl DispatcherStrategy for CloudwatchStrategy {
         let metrics_config = state.metrics.lock().unwrap();
 
         for i in metrics {
-            let data = Arc::new(i);
-            let druid_metric = data.metric.clone().unwrap_or(String::default());
-
-            if druid_metric == String::default() {
-                continue;
-            }
-
-            let metric_name = transform_metric_name(druid_metric.clone());
-
-            if !check_allowed_metric(&metrics_config, metric_name.clone()) {
-                continue;
-            }
-
-            metric_data.push(
-                add_cw_metric(
-                    Arc::clone(&data),
-                    &metric_name,
-                )
-            );
+            match self.get_metric(i, &metrics_config) {
+                Some(e) => metric_data.push(e),
+                None => continue,
+            };
         }
 
         let r = cw.put_metric_data()
