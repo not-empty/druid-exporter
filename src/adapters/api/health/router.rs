@@ -1,4 +1,4 @@
-use actix_web::{Responder, HttpResponse, get};
+use actix_web::{get, HttpResponse, Responder};
 
 
 #[get("/health")]

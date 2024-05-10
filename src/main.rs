@@ -1,15 +1,13 @@
 mod types;
-mod routes;
 mod utils;
+mod adapters;
+mod application;
+mod infra;
+mod version;
 
-use std::collections::HashMap;
-
-use actix_web::{App, HttpServer, web, middleware::Logger};
 use dotenv::dotenv;
 use env_logger::Env;
-use prometheus::Registry;
-use routes::{druid::druid_handler, metrics::metrics_handler, health::health_handler};
-use types::app_state::AppState;
+use infra::app::start_app;
 use utils::file::read_file_icon;
 
 
@@ -20,22 +18,5 @@ async fn main() -> std::io::Result<()> {
 
     read_file_icon();
 
-    let data = web::Data::new(AppState {
-        registry: Registry::new().into(),
-        metrics_gauge: HashMap::new().into(),
-        metrics_histogram: HashMap::new().into(),
-    });
-
-    HttpServer::new(move || {
-        App::new()
-            .app_data(web::PayloadConfig::new(20971520))
-            .app_data(data.clone())
-            .service(health_handler)
-            .service(druid_handler)
-            .service(metrics_handler)
-            .wrap(Logger::default())
-    })
-    .bind(("0.0.0.0", 7080))?
-    .run()
-    .await
+    start_app().await
 }
