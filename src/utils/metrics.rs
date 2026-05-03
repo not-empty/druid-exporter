@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::{MutexGuard, Arc}, env};
 
 use prometheus::{GaugeVec, HistogramVec, Registry, HistogramOpts, Opts};
 
-use crate::types::{self, druid::metrics::{DruidMetric, Returns}};
+use crate::types::{self, druid::metrics::DruidMetric};
 
 
 static BASE_LABELS: [&'static str; 6] = [
@@ -14,6 +14,7 @@ static BASE_LABELS: [&'static str; 6] = [
     "id",
 ];
 
+#[cfg(feature = "cloudwatch")]
 fn get_cw_metric_unit(metric: String) -> aws_sdk_cloudwatch::types::StandardUnit {
     let times = vec![
         "_time",
@@ -114,14 +115,11 @@ pub fn add_metric(
     let mut labels2: HashMap<&str, String> = HashMap::new();
 
     for i in BASE_LABELS {
-        let c = metrics.get(i).unwrap();
-
-        let r = match c {
-            Returns::String(t) => {
-                t.clone().unwrap_or(String::from("---"))
-            }
-            Returns::Float(_) | Returns::Types(_) => String::from("---")
-        };
+        let r = metrics
+            .get_string_field(i)
+            .unwrap()
+            .clone()
+            .unwrap_or(String::from("---"));
 
         labels2.insert(
             i,
@@ -154,6 +152,7 @@ pub fn add_metric(
     }
 }
 
+#[cfg(feature = "cloudwatch")]
 pub fn add_cw_metric(
     data: Arc<&DruidMetric>,
     metric_name: &String,

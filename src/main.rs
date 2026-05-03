@@ -5,7 +5,7 @@ mod application;
 mod infra;
 mod version;
 
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use env_logger::Env;
 use infra::app::start_app;
 use utils::file::read_file_icon;

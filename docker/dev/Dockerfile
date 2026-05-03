@@ -1,7 +1,7 @@
-FROM rust:1.77.0-slim-bullseye AS build
+FROM rust:1.91.1-slim-bullseye AS build
 
 WORKDIR /app
 
-RUN cargo install cargo-watch
+RUN cargo install cargo-watch --locked
 
 COPY . .
