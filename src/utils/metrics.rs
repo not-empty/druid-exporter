@@ -14,72 +14,6 @@ static BASE_LABELS: [&'static str; 6] = [
     "id",
 ];
 
-#[cfg(feature = "cloudwatch")]
-fn get_cw_metric_unit(metric: String) -> aws_sdk_cloudwatch::types::StandardUnit {
-    let times = vec![
-        "_time",
-        "_ttfb",
-        "_backpressure",
-        "_planningtimems",
-        "_fetchandprocessmillis",
-        "_queuetime",
-        "_runtime",
-        "_unstabletime",
-        "_transfertime",
-        "_uptime",
-    ];
-
-    let bytes = vec![
-        "_bytes",
-        "_queuesize",
-        "_sizebytes",
-        "_averagebyte",
-        "_loadqueue_size",
-        "_capacity",
-        "_used",
-        "_segment_max",
-        "_pendingdelete",
-        "_swap_free",
-        "_swap_max",
-        "_write_size",
-        "_read_size",
-        "_fs_used",
-        "_fs_max",
-        "_mem_used",
-        "_mem_max",
-        "_mem_free",
-        "_storage_used",
-    ];
-
-    let percent = vec![
-        "_hitrate",
-        "_usedpercent",
-        "_sys_cpu",
-    ];
-
-    let mut unit = aws_sdk_cloudwatch::types::StandardUnit::Count;
-
-    for i in times {
-        if metric.ends_with(i) {
-            unit = aws_sdk_cloudwatch::types::StandardUnit::Milliseconds;
-        }
-    }
-
-    for i in bytes {
-        if metric.ends_with(i) {
-            unit = aws_sdk_cloudwatch::types::StandardUnit::Bytes;
-        }
-    }
-
-    for i in percent {
-        if metric.ends_with(i) {
-            unit = aws_sdk_cloudwatch::types::StandardUnit::Percent;
-        }
-    }
-
-    unit
-}
-
 pub fn transform_metric_name(metric_name: String) -> String {
     String::from("druid_expo_")
         + &metric_name
@@ -150,24 +84,6 @@ pub fn add_metric(
             None => ()
         };
     }
-}
-
-#[cfg(feature = "cloudwatch")]
-pub fn add_cw_metric(
-    data: Arc<&DruidMetric>,
-    metric_name: &String,
-) -> aws_sdk_cloudwatch::types::MetricDatum {
-    aws_sdk_cloudwatch::types::MetricDatum::builder()
-        .value(data.value.clone().unwrap_or(0.0))
-        .metric_name(metric_name.to_string())
-        .unit(get_cw_metric_unit(metric_name.to_string()))
-        .dimensions(
-            aws_sdk_cloudwatch::types::Dimension::builder()
-                .name("Service".to_string())
-                .value(data.service.clone().unwrap_or(String::from("---")))
-                .build()
-        )
-        .build()
 }
 
 pub fn register_new_metric(
