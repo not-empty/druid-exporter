@@ -1,7 +1,5 @@
 use std::{fs, env};
 
-use yaml_rust::YamlLoader;
-
 use crate::types;
 use crate::version::VERSION;
 
@@ -17,47 +15,10 @@ pub fn read_file_icon() {
 }
 
 pub fn read_config_yaml() -> types::metrics::Metrics {
-    if !fs::metadata(env::current_dir().unwrap().to_str().unwrap().to_owned() + "/expo.yaml").is_ok() {
-        return types::metrics::Metrics {
-            ignore: vec![],
-            allowed: vec![],
-        };
-    }
+    let config_path = env::current_dir().unwrap().to_str().unwrap().to_owned() + "/expo.yaml";
 
-    match fs::read_to_string(env::current_dir().unwrap().to_str().unwrap().to_owned() + "/expo.yaml") {
-        Ok(t) => {
-            let file = YamlLoader::load_from_str(&t).unwrap();
-            let f = &file[0];
-
-            let mut ignore = vec![];
-            let mut allowed = vec![];
-
-            if !f["ignore"].is_badvalue() {
-                for i in f["ignore"].as_vec().unwrap() {
-                    if i.as_str() != None {
-                        ignore.push(String::from(i.as_str().unwrap()));
-                    }
-                }
-            }
-
-            if !f["allowed"].is_badvalue() {
-                for i in f["allowed"].as_vec().unwrap() {
-                    if i.as_str() != None {
-                        allowed.push(String::from(i.as_str().unwrap()));
-                    }
-                }
-            }
-
-            types::metrics::Metrics {
-                ignore,
-                allowed,
-            }
-        },
-        Err(_) => {
-            types::metrics::Metrics {
-                ignore: vec![],
-                allowed: vec![],
-            }
-        },
+    match fs::read_to_string(config_path) {
+        Ok(contents) => serde_yaml::from_str::<types::metrics::Metrics>(&contents).unwrap_or_default(),
+        Err(_) => types::metrics::Metrics::default(),
     }
 }

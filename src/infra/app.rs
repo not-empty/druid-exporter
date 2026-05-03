@@ -1,7 +1,9 @@
 use std::{collections::HashMap, env};
 
 use actix_web::{App, HttpServer, web, middleware::Logger};
+#[cfg(feature = "cloudwatch")]
 use aws_config::BehaviorVersion;
+#[cfg(feature = "cloudwatch")]
 use aws_sdk_cloudwatch::config::{Credentials, SharedCredentialsProvider};
 use prometheus::Registry;
 
@@ -11,14 +13,33 @@ use crate::utils::file::read_config_yaml;
 
 
 fn get_dispatchers() -> Vec<String> {
-    Vec::from_iter(
+    #[cfg(feature = "cloudwatch")]
+    return Vec::from_iter(
         env::var("DISPATCHERS")
             .unwrap_or(String::from("prometheus"))
             .split(",")
             .map(str::to_string)
-    )
+    );
+
+    #[cfg(not(feature = "cloudwatch"))]
+    let mut dispatchers = Vec::from_iter(
+        env::var("DISPATCHERS")
+            .unwrap_or(String::from("prometheus"))
+            .split(",")
+            .map(str::to_string)
+    );
+
+    #[cfg(not(feature = "cloudwatch"))]
+    if dispatchers.iter().any(|dispatcher| dispatcher == "cloudwatch") {
+        log::warn!("Ignoring `cloudwatch` dispatcher because the binary was built without the `cloudwatch` feature");
+        dispatchers.retain(|dispatcher| dispatcher != "cloudwatch");
+    }
+
+    #[cfg(not(feature = "cloudwatch"))]
+    dispatchers
 }
 
+#[cfg(feature = "cloudwatch")]
 async fn get_cw_client() -> Option<aws_sdk_cloudwatch::Client> {
     let d = get_dispatchers();
 
@@ -45,6 +66,7 @@ pub async fn start_app() -> std::io::Result<()> {
         registry: Registry::new().into(),
         metrics_gauge: HashMap::new().into(),
         metrics_histogram: HashMap::new().into(),
+        #[cfg(feature = "cloudwatch")]
         cw: get_cw_client().await.into(),
         dispatchers: get_dispatchers().into(),
         metrics: read_config_yaml().into(),

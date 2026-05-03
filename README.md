@@ -66,6 +66,8 @@ Please create ```.env``` file from ```.env.example``` and fill in all keys
 
 In ```.env``` file, you can enable the dispatcher by setting the value of the ```DISPATCHERS``` key. he available values are ```prometheus``` and ```cloudwatch```, and you can specify one or both (separated by commas). This setting is optional, with the default value being ```prometheus```.
 
+CloudWatch support is also a compile-time Cargo feature. The default build only includes Prometheus. If you set ```DISPATCHERS=cloudwatch``` without building with the ```cloudwatch``` feature, the dispatcher will be ignored.
+
 It's optional, but you can filter events that will be sent to the dispatcher by configuring the ```expo.yaml``` file based on ```expo.yaml.example```. This allows you to ignore or allow specific events.
 
 ```yaml
@@ -121,6 +123,12 @@ In development mode you can run the following command on your terminal:
 docker compose up
 ```
 
+If you want to run the project with CloudWatch support outside Docker Compose, enable the Cargo feature explicitly:
+
+```bash
+cargo run --features cloudwatch
+```
+
 After the command is executed you can go to [http://localhost:3000](http://localhost:3000) and do login to Grafana with this credentials
 
 > user: admin
@@ -139,6 +147,12 @@ In production mode you can build the Dockerfile located in the ```docker/prod```
 
 ```bash
 docker build --target prod -t druid-exporter -f docker/prod/Dockerfile .
+```
+
+If you need CloudWatch in a production build, compile with the feature enabled:
+
+```bash
+cargo build --release --features cloudwatch
 ```
 
 > ⚠️ We recommend using Docker BuildKit for better build performance
