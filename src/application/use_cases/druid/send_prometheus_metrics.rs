@@ -13,10 +13,6 @@ impl DispatcherStrategy for PrometheusStrategy {
         metrics: &[DruidMetric],
         state: web::Data<AppState>,
     ) {
-        if !state.dispatchers.lock().unwrap().contains(&String::from("prometheus")){
-            return;
-        }
-
         let registry = state.registry.lock().unwrap();
         let metrics_config = state.metrics.lock().unwrap();
         let mut metrics_gauge = state.metrics_gauge.lock().unwrap();
